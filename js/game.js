@@ -35,6 +35,12 @@ var player = {
 
 canvas.addEventListener('click', action);
 canvas.addEventListener('mousemove', action);
+window.addEventListener("resize", update);
+
+function update() {
+  cH = ctx.canvas.height = window.innerHeight;
+  cW = ctx.canvas.width  = window.innerWidth ;
+}
 
 function move(e) {
   player.deg = Math.atan2(e.offsetX - (cW/2), -(e.offsetY - (cH/2)));
@@ -62,7 +68,7 @@ function action(e) {
     if(gameOver) {
       dist = Math.sqrt(((e.offsetX - cW/2) * (e.offsetX - cW/2)) + ((e.offsetY - (cH/2 + 45 + 22)) * (e.offsetY - (cH/2+ 45 + 22))));
       if (dist < 27) {
-        if(e.type == 'click') {
+        if(e.type === 'click') {
           gameOver   = false;
           count      = 0;
           bullets    = [];
@@ -83,7 +89,7 @@ function action(e) {
       dist = Math.sqrt(((e.offsetX - cW/2) * (e.offsetX - cW/2)) + ((e.offsetY - cH/2) * (e.offsetY - cH/2)));
 
       if (dist < 27) {
-        if(e.type == 'click') {
+        if(e.type === 'click') {
           playing = true;
           canvas.removeEventListener("mousemove", action);
           canvas.addEventListener('contextmenu', action);
