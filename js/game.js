@@ -4,30 +4,30 @@ window.addEventListener("DOMContentLoaded", game);
 // General sprite load
 var sprite = new Image();
 var spriteExplosion = new Image();
-sprite.src = 'img/main_elements.png'; // Загружаем общий спрайт
+sprite.src = 'img/main_elements.png';        // Загружаем общий спрайт
 
-window.onload = function() { // load – браузер загрузил HTML и внешние ресурсы (картинки, стили и т.д.).
+window.onload = function() {                 // load – браузер загрузил HTML и внешние ресурсы (картинки, стили и т.д.).
   spriteExplosion.src = 'img/explosion.png'; // Загружаем спрайт взрыва
 };
 
-// Game
 function game() {
+  // Initialize canvas and required variables
   // Canvas
   var canvas = document.getElementById('canvas'),
-      ctx = canvas.getContext('2d'),
-      cH = ctx.canvas.height = window.innerHeight, // Высота области просмотра окна браузера, включая, если отображается, горизонтальную полосу прокрутки
-      cW = ctx.canvas.width = window.innerWidth; // Внутренняя ширина окна в пикселях (включая ширину вертикальной полосы прокрутки при её наличии)
+      ctx = canvas.getContext('2d'),       // Create canvas context
+      cH = ctx.canvas.height = window.innerHeight, // Window's height
+      cW = ctx.canvas.width = window.innerWidth;   // Window's width
 
   // Game
-  var bullets = [],    // Пули/выстрелы
-      asteroids = [],  // Астероиды
-      explosions = [], // Взрывы
-      destroyed = 0,
-      record = 0,
-      count = 0,
-      playing = false,  // Состояние игры (продолжается ли игра)
-      gameOver = false, // Окончена ли игра
-      _planet = {deg: 0};
+  var bullets = [],       // Array containing bullets
+      asteroids = [],     // Array containing asteroids
+      explosions = [],    // Array containing explosions
+      destroyed = 0,      // The amount of asteroids destroyed
+      record = 0,         // Variable to store the record
+      count = 0,          //
+      playing = false,    // Flag variable, changed when the game is playing
+      gameOver = false,   // Flag variable, changed when the game is over
+      _planet = {deg: 0}; // Angle
 
   // Player
   var player = {
@@ -38,10 +38,12 @@ function game() {
     deg    : 0
   };
 
+  // Add mousemove, click and resize events to the canvas
   canvas.addEventListener('click', action);
   canvas.addEventListener('mousemove', action);
   window.addEventListener("resize", update);
 
+  // Set the canvas's height and width to full screen
   function update() {
     cH = ctx.canvas.height = window.innerHeight;
     cW = ctx.canvas.width  = window.innerWidth ;
@@ -137,16 +139,16 @@ function game() {
 
         ctx.restore();
 
-        //Real coords
+        // Real coords
         bullets[i].realX = (0) - (bullets[i].y + 10) * Math.sin(bullets[i].deg);
         bullets[i].realY = (0) + (bullets[i].y + 10) * Math.cos(bullets[i].deg);
 
         bullets[i].realX += cW/2;
         bullets[i].realY += cH/2;
 
-        //Collision
+        // Collision
         for (var j = 0; j < asteroids.length; j++) {
-          if(!asteroids[j].destroyed) {
+          if (!asteroids[j].destroyed) {
             distance = Math.sqrt(Math.pow(
                 asteroids[j].realX - bullets[i].realX, 2) +
                 Math.pow(asteroids[j].realY - bullets[i].realY, 2)
@@ -164,7 +166,8 @@ function game() {
     }
   }
 
-  function planet() { // Ф-я рисует вращающуюся планету
+  // Function for drawing the planet on canvas
+  function planet() {
     ctx.save();
     ctx.fillStyle   = 'white';
     ctx.shadowBlur    = 100;
@@ -181,14 +184,15 @@ function game() {
     );
     ctx.fill();
 
-    //Planet rotation
+    // Planet rotation
     ctx.translate(cW/2,cH/2);
     ctx.rotate((_planet.deg += 0.1) * (Math.PI / 180));
     ctx.drawImage(sprite, 0, 0, 200, 200, -100, -100, 200,200);
     ctx.restore();
   }
 
-  function _player() { // Ф-я рисует корабль
+  // Function for drawing the spaceship on canvas
+  function _player() {
     ctx.save();
 
     ctx.translate(cW/2,cH/2);
@@ -212,7 +216,8 @@ function game() {
     }
   }
 
-  function newAsteroid() { // Ф-я добавляет новый астероид в массив астероидов
+  // Function for adding a new asteroid to the array of asteroids
+  function newAsteroid() {
 
     var type = random(1, 4),
         coordsX,
@@ -257,14 +262,15 @@ function game() {
     asteroids.push(asteroid);
   }
 
+  // Function for creating asteroids
   function _asteroids() {
     var distance;
 
-    for (var i = 0; i < asteroids.length; i++) {
-      if (!asteroids[i].destroyed) {
-        ctx.save();
-        ctx.translate(asteroids[i].coordsX, asteroids[i].coordsY);
-        ctx.rotate(asteroids[i].deg);
+    for (var i = 0; i < asteroids.length; i++) { // Проходимся в цикле по массиву астероидов
+      if (!asteroids[i].destroyed) { // Если астероид не уничтожен,
+        ctx.save(); // сохраняем контекст
+        ctx.translate(asteroids[i].coordsX, asteroids[i].coordsY); // помещаем его в рандомные координаты
+        ctx.rotate(asteroids[i].deg); // и поворачиваем на заданный угол
 
         ctx.drawImage(
             sprite,
@@ -278,7 +284,7 @@ function game() {
             asteroids[i].height / asteroids[i].size
         );
 
-        ctx.restore();
+        ctx.restore(); // восстанавливаем контекст
 
         // Real Coords
         asteroids[i].realX = (0) - (asteroids[i].moveY + ((asteroids[i].height / asteroids[i].size)/2)) * Math.sin(asteroids[i].deg);
@@ -351,14 +357,14 @@ function game() {
   function start() {
     if(!gameOver) { // Если игра не окончена, перерисовываем canvas
       ctx.beginPath();
-      //Clear
+      // Clear
       ctx.clearRect(0, 0, cW, cH);
       ctx.beginPath();
 
-      //Planet
+      // Planet
       planet(); // Рисуем планету
 
-      //Player
+      // Player
       _player(); // Рисуем игрока (корабль)
 
       if (playing) { // Пока игра идёт, управляем поведением астероидов
@@ -404,7 +410,7 @@ function game() {
       ctx.font = '20px Verdana';
       ctx.fillStyle = 'white';
       ctx.textAlign = 'center';
-      ctx.fillText('RECORD: '+ record, cW/2,cH/2 + 185); // Выволдим значение рекорда
+      ctx.fillText('RECORD: '+ record, cW/2,cH/2 + 185); // Выводим значение рекорда
 
       ctx.drawImage(sprite, 500, 18, 70, 70, cW/2 - 35, cH/2 + 40, 70,70);
 
