@@ -1,432 +1,88 @@
-// Браузер полностью загрузил HTML, было построено DOM-дерево, но внешние ресурсы м.б. ещё не загружены
-window.addEventListener("DOMContentLoaded", game);
+// Add images
+let shipimg = new Image();
+shipimg.src = "img/ship.png";
 
-// General sprite load
-var sprite = new Image();
-var spriteExplosion = new Image();
-sprite.src = 'img/main_elements.png';        // Загружаем общий спрайт
+let asterimg = new Image();
+asterimg.src = "img/aster.png";
 
-window.onload = function() {                 // load – браузер загрузил HTML и внешние ресурсы (картинки, стили и т.д.).
-  spriteExplosion.src = 'img/explosion.png'; // Загружаем спрайт взрыва
+let asterimg2 = new Image();
+asterimg2.src = "img/aster2.png";
+
+let alien = new Image();
+alien.src = "img/spaceship.png";
+
+let alien2 = new Image();
+alien2.src = "img/alien2.png";
+
+let alien3 = new Image();
+alien3.src = "img/alien3.png";
+
+let expl = new Image();
+expl.src = "img/boom.png";
+
+let planetImg = new Image();
+planetImg.src = "img/planet.png"
+
+let planetImg2 = new Image();
+planetImg2.src = "img/planet2.png"
+
+let planetImg3 = new Image();
+planetImg3.src = "img/planet3.png"
+
+let fire1 = new Image();
+fire1.src = "img/fire.png";
+
+let bonusImg = new Image();
+bonusImg.src = "img/bonus.png";
+
+let bonusImg2 = new Image();
+bonusImg2.src = "img/bonus2.png";
+
+// Set an array of shots
+let fire = [];
+
+// Set an array of asteroids
+let aster = [];
+
+// Set an array of explosions
+let boom = [];
+
+// Set an array of bonuses
+let bonus = [];
+
+let arrScore = [];
+
+// Set playing window size
+let bodyHeight = document.body.offsetHeight;
+let bodyWidth = document.body.offsetWidth;
+
+let playing = {
+  color: '#0a0530',
+  height: bodyHeight,
+  width: bodyWidth,
+  top: 0,
+  left: 0,
 };
 
-function game() {
-  // Initialize canvas and required variables
-  // Canvas
-  var canvas = document.getElementById('canvas'),
-      ctx = canvas.getContext('2d'),       // Create canvas context
-      cH = ctx.canvas.height = window.innerHeight, // Window's height
-      cW = ctx.canvas.width = window.innerWidth;   // Window's width
+// Set sizes
+let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
 
-  // Game
-  var bullets = [],       // Array containing bullets
-      asteroids = [],     // Array containing asteroids
-      explosions = [],    // Array containing explosions
-      destroyed = 0,      // The amount of asteroids destroyed
-      record = 0,         // Variable to store the record
-      count = 0,          //
-      playing = false,    // Flag variable, changed when the game is playing
-      gameOver = false,   // Flag variable, changed when the game is over
-      _planet = {deg: 0}; // Angle
+let shipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
 
-  // Player
-  var player = {
-    posX   : -35,
-    posY   : -(100+82),
-    width  : 70,
-    height : 79,
-    deg    : 0
-  };
+let asterSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 
-  // Add mousemove, click and resize events to the canvas
-  canvas.addEventListener('click', action);
-  canvas.addEventListener('mousemove', action);
-  window.addEventListener("resize", update);
+let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 
-  // Set the canvas's height and width to full screen
-  function update() {
-    cH = ctx.canvas.height = window.innerHeight;
-    cW = ctx.canvas.width  = window.innerWidth ;
-  }
+let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 18);
 
-  function move(e) {
-    player.deg = Math.atan2(e.offsetX - (cW/2), -(e.offsetY - (cH/2)));
-  }
+let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
-  function action(e) {
-    e.preventDefault();
+let bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
-    if (playing) { // Если игра продолжается, добавляем пули в массив пуль
-      var bullet = {
-        x: -8,
-        y: -179,
-        sizeX : 2,
-        sizeY : 10,
-        realX : e.offsetX, // The offsetX property returns the x-coordinate of the mouse pointer, relative to the target element
-        realY : e.offsetY,
-        dirX  : e.offsetX,
-        dirY  : e.offsetY,
-        deg   : Math.atan2(e.offsetX - (cW/2), -(e.offsetY - (cH/2))),
-        destroyed: false
-      };
+// CANVAS
+let newCanvas = document.querySelector('.gameCanvas');
+newCanvas.setAttribute('height', playing.height);
+newCanvas.setAttribute('width', playing.width);
+let context = newCanvas.getContext('2d');
 
-      bullets.push(bullet);
-
-    } else {
-      var dist;
-
-      if (gameOver) { // Если игра окончена
-        dist = Math.sqrt(((e.offsetX - cW/2) * (e.offsetX - cW/2)) + ((e.offsetY - (cH/2 + 45 + 22)) * (e.offsetY - (cH/2+ 45 + 22))));
-        if (dist < 27) {
-          if (e.type === 'click') {
-            gameOver   = false;
-            count      = 0;
-            bullets    = [];
-            asteroids  = [];
-            explosions = [];
-            destroyed  = 0;
-            player.deg = 0;
-            canvas.removeEventListener('contextmenu', action);
-            canvas.removeEventListener('mousemove', move);
-            canvas.style.cursor = 'default';
-          } else {
-            canvas.style.cursor = 'pointer';
-          }
-        } else {
-          canvas.style.cursor = 'default';
-        }
-      } else { // Если игра не окончена
-        dist = Math.sqrt(((e.offsetX - cW/2) * (e.offsetX - cW/2)) + ((e.offsetY - cH/2) * (e.offsetY - cH/2)));
-
-        if (dist < 27) {
-          if (e.type === 'click') {
-            playing = true;
-            canvas.removeEventListener('mousemove', action);
-            canvas.addEventListener('contextmenu', action);
-            canvas.addEventListener('mousemove', move);
-            canvas.setAttribute('class', 'playing');
-            canvas.style.cursor = 'default';
-          } else {
-            canvas.style.cursor = 'pointer';
-          }
-        } else {
-          canvas.style.cursor = 'default';
-        }
-      }
-    }
-  }
-
-  function fire() { // Ф-я описывает функционал для стрельбы
-    var distance;
-
-    for (var i = 0; i < bullets.length; i++) {
-      if(!bullets[i].destroyed) {
-        ctx.save();
-        ctx.translate(cW/2,cH/2);
-        ctx.rotate(bullets[i].deg);
-
-        ctx.drawImage(
-            sprite,
-            211,
-            100,
-            50,
-            75,
-            bullets[i].x,
-            bullets[i].y -= 20,
-            19,
-            30
-        );
-
-        ctx.restore();
-
-        // Real coords
-        bullets[i].realX = (0) - (bullets[i].y + 10) * Math.sin(bullets[i].deg);
-        bullets[i].realY = (0) + (bullets[i].y + 10) * Math.cos(bullets[i].deg);
-
-        bullets[i].realX += cW/2;
-        bullets[i].realY += cH/2;
-
-        // Collision
-        for (var j = 0; j < asteroids.length; j++) {
-          if (!asteroids[j].destroyed) {
-            distance = Math.sqrt(Math.pow(
-                asteroids[j].realX - bullets[i].realX, 2) +
-                Math.pow(asteroids[j].realY - bullets[i].realY, 2)
-            );
-
-            if (distance < (((asteroids[j].width/asteroids[j].size) / 2) - 4) + ((19 / 2) - 4)) {
-              destroyed += 1;
-              asteroids[j].destroyed = true;
-              bullets[i].destroyed   = true;
-              explosions.push(asteroids[j]);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Function for drawing the planet on canvas
-  function planet() {
-    ctx.save();
-    ctx.fillStyle   = 'white';
-    ctx.shadowBlur    = 100;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowColor   = '#999';
-
-    ctx.arc(
-        (cW/2),
-        (cH/2),
-        100,
-        0,
-        Math.PI * 2
-    );
-    ctx.fill();
-
-    // Planet rotation
-    ctx.translate(cW/2,cH/2);
-    ctx.rotate((_planet.deg += 0.1) * (Math.PI / 180));
-    ctx.drawImage(sprite, 0, 0, 200, 200, -100, -100, 200,200);
-    ctx.restore();
-  }
-
-  // Function for drawing the spaceship on canvas
-  function _player() {
-    ctx.save();
-
-    ctx.translate(cW/2,cH/2);
-    ctx.rotate(player.deg);
-    ctx.drawImage(
-        sprite,
-        200,
-        0,
-        player.width,
-        player.height,
-        player.posX,
-        player.posY,
-        player.width,
-        player.height
-    );
-
-    ctx.restore();
-
-    if (bullets.length - destroyed && playing) {
-      fire();
-    }
-  }
-
-  // Function for adding a new asteroid to the array of asteroids
-  function newAsteroid() {
-
-    var type = random(1, 4),
-        coordsX,
-        coordsY;
-
-    switch(type){
-      case 1:
-        coordsX = random(0, cW);
-        coordsY = 0 - 150;
-        break;
-      case 2:
-        coordsX = cW + 150;
-        coordsY = random(0, cH);
-        break;
-      case 3:
-        coordsX = random(0, cW);
-        coordsY = cH + 150;
-        break;
-      case 4:
-        coordsX = 0 - 150;
-        coordsY = random(0, cH);
-        break;
-    }
-
-    var asteroid = {
-      x: 278,
-      y: 0,
-      state: 0,
-      stateX: 0,
-      width: 134,
-      height: 123,
-      realX: coordsX,
-      realY: coordsY,
-      moveY: 0,
-      coordsX: coordsX,
-      coordsY: coordsY,
-      size: random(1, 3),
-      deg: Math.atan2(coordsX  - (cW/2), -(coordsY - (cH/2))),
-      destroyed: false
-    };
-
-    asteroids.push(asteroid);
-  }
-
-  // Function for creating asteroids
-  function _asteroids() {
-    var distance;
-
-    for (var i = 0; i < asteroids.length; i++) { // Проходимся в цикле по массиву астероидов
-      if (!asteroids[i].destroyed) { // Если астероид не уничтожен,
-        ctx.save(); // сохраняем контекст
-        ctx.translate(asteroids[i].coordsX, asteroids[i].coordsY); // помещаем его в рандомные координаты
-        ctx.rotate(asteroids[i].deg); // и поворачиваем на заданный угол
-
-        ctx.drawImage(
-            sprite,
-            asteroids[i].x,
-            asteroids[i].y,
-            asteroids[i].width,
-            asteroids[i].height,
-            -(asteroids[i].width / asteroids[i].size) / 2,
-            asteroids[i].moveY += 1/(asteroids[i].size),
-            asteroids[i].width / asteroids[i].size,
-            asteroids[i].height / asteroids[i].size
-        );
-
-        ctx.restore(); // восстанавливаем контекст
-
-        // Real Coords
-        asteroids[i].realX = (0) - (asteroids[i].moveY + ((asteroids[i].height / asteroids[i].size)/2)) * Math.sin(asteroids[i].deg);
-        asteroids[i].realY = (0) + (asteroids[i].moveY + ((asteroids[i].height / asteroids[i].size)/2)) * Math.cos(asteroids[i].deg);
-
-        asteroids[i].realX += asteroids[i].coordsX;
-        asteroids[i].realY += asteroids[i].coordsY;
-
-        // Game over
-        distance = Math.sqrt(Math.pow(asteroids[i].realX - cW/2, 2) + Math.pow(asteroids[i].realY - cH/2, 2));
-        if (distance < (((asteroids[i].width/asteroids[i].size) / 2) - 4) + 100) {
-          gameOver = true;
-          playing  = false;
-          canvas.addEventListener('mousemove', action);
-        }
-      } else if(!asteroids[i].extinct) {
-        explosion(asteroids[i]);
-      }
-    }
-
-    if (asteroids.length - destroyed < 10 + (Math.floor(destroyed/6))) { // Проверяем, нужно ли добавить новых астероидов
-      newAsteroid();
-    }
-  }
-
-  function explosion(asteroid) {
-    ctx.save();
-    ctx.translate(asteroid.realX, asteroid.realY);
-    ctx.rotate(asteroid.deg);
-
-    var spriteY,
-        spriteX = 256;
-    if (asteroid.state === 0) {
-      spriteY = 0;
-      spriteX = 0;
-    } else if (asteroid.state < 8) {
-      spriteY = 0;
-    } else if (asteroid.state < 16) {
-      spriteY = 256;
-    } else if (asteroid.state < 24) {
-      spriteY = 512;
-    } else {
-      spriteY = 768;
-    }
-
-    if (asteroid.state === 8 || asteroid.state === 16 || asteroid.state === 24) {
-      asteroid.stateX = 0;
-    }
-
-    ctx.drawImage(
-        spriteExplosion,
-        asteroid.stateX += spriteX,
-        spriteY,
-        256,
-        256,
-        - (asteroid.width / asteroid.size) / 2,
-        - (asteroid.height / asteroid.size) / 2,
-        asteroid.width / asteroid.size,
-        asteroid.height / asteroid.size
-    );
-    asteroid.state += 1;
-
-    if (asteroid.state === 31) {
-      asteroid.extinct = true;
-    }
-
-    ctx.restore();
-  }
-
-  function start() {
-    if(!gameOver) { // Если игра не окончена, перерисовываем canvas
-      ctx.beginPath();
-      // Clear
-      ctx.clearRect(0, 0, cW, cH);
-      ctx.beginPath();
-
-      // Planet
-      planet(); // Рисуем планету
-
-      // Player
-      _player(); // Рисуем игрока (корабль)
-
-      if (playing) { // Пока игра идёт, управляем поведением астероидов
-        _asteroids();
-
-        ctx.font = '20px Verdana';
-        ctx.fillStyle = 'white';
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'left';
-        ctx.fillText('Record: ' + record + '', 20, 30);
-
-        ctx.font = '40px Verdana';
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.strokeText('' + destroyed + '', cW/2,cH/2);
-        ctx.fillText('' + destroyed + '', cW/2,cH/2);
-
-      } else {
-        ctx.drawImage(sprite, 428, 12, 70, 70, cW/2 - 35, cH/2 - 35, 70,70);
-      }
-    } else if (count < 1) {
-      count = 1;
-      ctx.fillStyle = 'rgba(0,0,0,0.75)';
-      ctx.rect(0,0, cW,cH);
-      ctx.fill();
-
-      ctx.font = '60px Verdana';
-      ctx.fillStyle = 'white';
-      ctx.textAlign = 'center';
-      ctx.fillText('GAME OVER',cW/2,cH/2 - 150); // Объявляем окончание игры
-
-      ctx.font = '20px Verdana';
-      ctx.fillStyle = 'white';
-      ctx.textAlign = 'center';
-      ctx.fillText('Total destroyed: '+ destroyed, cW/2,cH/2 + 140); // Выводим кол-во уничтоженных астероидов
-
-      // Обновляем значение рекорда игры (если кол-во уничтож. в данном сеансе игры аст-ов больше, чем в предыдущем,
-      // сохраняем значение текущего сеанса в качестве рекорда, иначе оставляем прежнее
-      record = destroyed > record ? destroyed : record;
-
-      ctx.font = '20px Verdana';
-      ctx.fillStyle = 'white';
-      ctx.textAlign = 'center';
-      ctx.fillText('RECORD: '+ record, cW/2,cH/2 + 185); // Выводим значение рекорда
-
-      ctx.drawImage(sprite, 500, 18, 70, 70, cW/2 - 35, cH/2 + 40, 70,70);
-
-      canvas.removeAttribute('class');
-    }
-  }
-
-  function init() {
-    window.requestAnimationFrame(init);
-    start();
-  }
-
-  init();
-
-  // Utils
-  function random(from, to) {
-    return Math.floor(Math.random() * (to - from + 1)) + from;
-  }
-}
+let gameWrapper = document.querySelector('.gameDiv');
