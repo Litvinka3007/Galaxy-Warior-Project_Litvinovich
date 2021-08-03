@@ -38,7 +38,13 @@ bonusImg.src = "img/bonus.png";
 let bonusImg2 = new Image();
 bonusImg2.src = "img/bonus2.png";
 
-let gradusCircle = 360;
+let degreesCircle = 360;
+
+// Setting the timer
+let timerGame = 0;
+
+// Counts how many times the timer has started up to 1000
+let timer = 0;
 
 // Set an array of shots
 let fire = [];
@@ -81,6 +87,8 @@ let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
 let bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
+let newEnemy = new Enemy();
+
 let ship = new Spaceship();
 
 let isPlaying = false;
@@ -97,7 +105,6 @@ let gameWrapper = document.querySelector('.gameDiv');
 
 // Spaceship
 function Spaceship() {
-
   let self = this;
   self.posX = playing.width / 2 - spaceshipSize / 2;
   self.posY = playing.height - spaceshipSize;
@@ -107,7 +114,6 @@ function Spaceship() {
   self.explosions = 3;
 
   self.moveSpaceship = function() {
-
     self.posX += self.speedX;
     self.posY += self.speedY;
 
@@ -122,15 +128,12 @@ function Spaceship() {
 
     // Checking for going out of bounds on the top
     if (ship.posY < playing.top) ship.posY = playing.top;
-
   }
 
   self.paintSpaceship = function() {
-
     // Draw a spaceship
     context.drawImage(shipImg, ship.posX, ship.posY, spaceshipSize, spaceshipSize);
   }
-
 }
 
 // Enemies
@@ -157,7 +160,6 @@ function Enemy() {
 
   // If the player hits an asteroid, add 2 smaller asteroids
   self.addAsteroids = function(size, side) {
-
     let asteroidItem = {};
     asteroidItem.size = asteroidSize * 70/100;
     asteroidItem.posX = size.posX;
@@ -175,7 +177,6 @@ function Enemy() {
   }
 
   self.enemyMove = function() {
-
     // Moving the asteroid
     for (let i = 0; i < asteroids.length; i++) {
 
@@ -188,13 +189,13 @@ function Enemy() {
 
       // Hitting the left wall
       if (asteroids[i].posX <= playing.left) {
-        asteroids[i].angle = gradusCircle / 2 - asteroids[i].angle;
+        asteroids[i].angle = degreesCircle / 2 - asteroids[i].angle;
         asteroids[i].posX = playing.left;
       }
 
       // Hitting the right wall
       if (asteroids[i].posX + asteroids[i].size >= playing.width) {
-        asteroids[i].angle = gradusCircle / 2 - asteroids[i].angle;
+        asteroids[i].angle = degreesCircle / 2 - asteroids[i].angle;
         asteroids[i].posX = playing.width - asteroids[i].size;
       }
 
@@ -206,11 +207,9 @@ function Enemy() {
   }
 
   self.enemyPaint = function() {
-
     for (let i = 0; i < asteroids.length; i++) {
 
       // Set images of enemies
-
       switch (asteroids[i].randomImg) {
         case 1:
 
@@ -261,7 +260,19 @@ function Enemy() {
   }
 }
 
-// Utils
+function gameRun() {
+  renderGame();
+}
+
+function renderGame() {
+  context.fillStyle = playing.color;
+  context.fillRect(playing.top, playing.left, playing.width, playing.height);
+
+  newEnemy.enemyPaint();
+  ship.paintSpaceship();
+}
+
+// UTILS
 
 // Function to generate a random number
 function randomNum(n, m) {
@@ -272,5 +283,7 @@ function randomNum(n, m) {
 function toRadians(angle) {
   return angle * (Math.PI / 180);
 }
+
+gameRun();
 
 
