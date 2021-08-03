@@ -81,6 +81,10 @@ let bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
 let ship = new Spaceship();
 
+let isPlaying = false;
+
+let randPass = 0;
+
 // CANVAS
 let newCanvas = document.querySelector('.gameCanvas');
 newCanvas.setAttribute('height', playing.height);
@@ -125,6 +129,11 @@ function Spaceship() {
     context.drawImage(shipImg, ship.posX, ship.posY, spaceshipSize, spaceshipSize);
   }
 
+}
+
+// Function to generate a random number
+function randomNum(n, m) {
+  return Math.floor(Math.random() * (m - n + 1)) + n;
 }
 
 
