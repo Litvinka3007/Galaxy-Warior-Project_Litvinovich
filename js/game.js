@@ -103,7 +103,12 @@ newCanvas.setAttribute('height', playing.height);
 newCanvas.setAttribute('width', playing.width);
 let context = newCanvas.getContext('2d');
 
+let nicknameInfo = document.querySelector('.nickInfo');
+let nickname = document.querySelector('.nickname');
+let wrapper = document.querySelector('.menuDiv');
 let gameWrapper = document.querySelector('.gameDiv');
+let gameOverWrapper = document.querySelector('.gameOverDiv');
+let scoreTable = document.querySelector('.tableDiv');
 
 // Spaceship
 function Spaceship() {
@@ -113,7 +118,7 @@ function Spaceship() {
   self.speedX = 0;
   self.speedY = 0;
   self.lives = 4;
-  self.explosions = 3;
+  self.bonuses = 3;
 
   self.moveSpaceship = function() {
     self.posX += self.speedX;
@@ -514,6 +519,54 @@ function generateColor() {
 // Function for converting degrees to radians
 function toRadians(angle) {
   return angle * (Math.PI / 180);
+}
+
+// Function shows the number of lives
+function displayHealth() {
+  let healthContainer = document.querySelector('.healthPoint');
+  healthContainer.style.display = 'inline-block';
+  healthContainer.style.position = 'absolute';
+
+  if (healthContainer.children.length > 0) {
+    while (healthContainer.children.length !== 0) {
+      healthContainer.removeChild(healthContainer.lastChild);
+    }
+  }
+
+  for (let i = 0; i < ship.lives - 1; i++) {
+    let healthImg = document.createElement('IMG');
+    healthImg.src = 'img/health_point.png';
+    healthImg.style.height = healthSize + 'px';
+    healthImg.style.width = healthSize + 'px';
+    healthImg.style.marginTop = healthSize / 5 + 'px';
+    healthImg.style.display = 'block';
+
+    healthContainer.appendChild(healthImg);
+  }
+}
+
+// Function shows the number of bonuses
+function displayBonuses() {
+  let bangContainer = document.querySelector('.bonuses');
+  bangContainer.style.display = 'inline-block';
+  bangContainer.style.position = 'absolute';
+
+  if (bangContainer.children.length > 0) {
+    while (bangContainer.children.length !== 0) {
+      bangContainer.removeChild(bangContainer.lastChild);
+    }
+  }
+
+  for (let i = 0; i < ship.bonuses; i++) {
+    let bangImg = document.createElement('IMG');
+    bangImg.src = 'img/bonus.png';
+    bangImg.style.height = bangSize + 'px';
+    bangImg.style.width = bangSize + 'px';
+    bangImg.style.marginTop = bangSize / 5 + 'px';
+    bangImg.style.display = 'block';
+
+    bangContainer.appendChild(bangImg);
+  }
 }
 
 gameRun();
