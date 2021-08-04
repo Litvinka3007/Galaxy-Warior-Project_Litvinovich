@@ -81,12 +81,17 @@ let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 18);
 let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 let bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 
+// Speed of explosion
 let boomSpeed = 0;
+// Acceleration of explosion
+let boomAccel = 0.2;
 
 let newStar = new Star();
+let newFire = new Fire();
 let newEnemy = new Enemy();
 let ship = new Spaceship();
 let planet = new Planet();
+let newBonus = new Bonus();
 
 let isPlaying = false;
 
