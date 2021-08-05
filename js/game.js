@@ -94,6 +94,7 @@ let boomAccel = 0.2;
 let newStar = new Star();
 let newFire = new Fire();
 let newEnemy = new Enemy();
+let controll = new Controller();
 let ship = new Spaceship();
 let planet = new Planet();
 let newBonus = new Bonus();
@@ -146,6 +147,180 @@ let gameWrapper = document.querySelector('.gameDiv');
 let gameOverWrapper = document.querySelector('.gameOverDiv');
 let scoreTable = document.querySelector('.tableDiv');
 
+function startHash() {
+  location.hash = 'game';
+}
+
+function startMenuHash() {
+  location.hash = 'menu';
+  lockGet(randPass);
+}
+
+// Start the game by click on the button
+function startGame() {
+  randPass = randomNum(1, 5000);
+  isPlaying = true;
+  location.hash = 'game';
+
+  // Hide the main menu
+  wrapper.style.display = 'none';
+
+  // Open the game elements
+  gameWrapper.style.display = 'block';
+
+  // Fix the name of the player
+  nickText = nickname.value;
+
+  // If the field "nickname" is empty, assign "user"
+  if (nickText == '') nickText = 'User';
+
+  nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
+
+  // Display the number of lives and bonuses
+  displayHealth();
+  displayBonuses();
+
+  newCanvas.style.cursor = 'none';    // ПОМЕНЯТЬ КУРСОР НА КРАСНЫЙ ПРИЦЕЛ
+
+  controll.start();
+  gameRun();
+}
+
+// Start the main menu
+function startMenu() {
+  location.hash = 'menu';
+
+  // If there is a timer, delete it
+  if (timerGame) {
+    cancelAnimationFrame(timerGame);
+    timerGame = 0;
+  }
+
+  // Open the main menu
+  wrapper.style.display = 'block';
+
+  // Hide the game elements
+  gameWrapper.style.display = 'none';
+  gameOverWrapper.style.display = 'none';
+
+  // Set the initial values
+  asteroids.length = 0;
+  bonus.length = 0;
+  ship.lives = 4;
+  ship.bonuses = 3;
+  newScore = 0;
+  nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
+}
+
+function gameOver() {
+  let overScore = document.querySelector('.overInfo');
+
+  // Hide the game elements
+  gameWrapper.style.display = 'none';
+  gameOverWrapper.style.display = 'block';
+
+  // Unsubscribe from the game events
+  controll.remList();
+
+  if (timerGame) {
+    cancelAnimationFrame(timerGame);
+    timerGame = 0;
+  }
+
+  newCanvas.style.cursor = 'default';
+
+  isPlaying = false;
+
+  overScore.innerText = nickText + ' : ' + scoreText(newScore);
+}
+
+function gameRun() {
+  // If there is a timer, delete it, otherwise set it
+  if (timerGame) {
+    cancelAnimationFrame(timerGame);
+    timerGame = 0;
+  }
+
+  timerGame = requestAnimationFrame(gameRun);
+  updateGame();
+  renderGame();
+}
+
+function updateGame() {
+  timer++;
+
+  if (timer > 1000) timer = 0;
+  // Create stars
+
+  if (timer % 2 === 0) {
+    newStar.addStarObj();
+  }
+
+  // Move stars
+  newStar.starObjMove();
+
+  // Create planets
+  if (timer === 5 || timer === 540) {
+    planet.addPlanet();
+  }
+
+  // Move planets
+  planet.planetMove();
+
+  // Create bonus
+  if (timer === 5) {
+    newBonus.addBonus();
+  }
+
+  // Move bonus
+  newBonus.bonusMove();
+
+  // Create enemies
+  if (timer % 30 === 0) {
+    newEnemy.addEnemy();
+  }
+
+  // Move enemy
+  newEnemy.enemyMove();
+
+  // Explosion animation
+  for (let i = 0; i < boom.length; i++) {
+
+    // Animation speed
+    boom[i].animX = boom[i].animX + boomAccel;
+
+    // Change the sprite rows
+    if (boom[i].animX > 8) { boom[i].animY++; boom[i].animX = 0 }
+
+    // If there are no lines anymore, delete it
+    if (boom[i].animY > 0) boom.splice(i, 1);
+  }
+
+  // Move the shot
+  newFire.fireMove();
+
+  // Move the ship at a speed of 0, when press the key, increase the speed
+  ship.moveSpaceship();
+}
+
+function renderGame() {
+  context.fillStyle = playing.color;
+  context.fillRect(playing.top, playing.left, playing.width, playing.height);
+
+  planet.planetPaint();
+  newStar.starObjPaint();
+  newBonus.bonusPaint();
+  newEnemy.enemyPaint();
+  newFire.firePaint();
+
+  // Draw an explosion
+  for (let i = 0; i < boom.length; i++) {
+    context.drawImage(explosion, 65 * Math.floor(boom[i].animX), 65 * Math.floor(boom[i].animY), 65, 65, boom[i].x, boom[i].y, boomSize, boomSize);
+  }
+
+  ship.paintSpaceship();
+}
+
 // Spaceship
 function Spaceship() {
   let self = this;
@@ -176,6 +351,26 @@ function Spaceship() {
   self.paintSpaceship = function() {
     // Draw a spaceship
     context.drawImage(shipImg, ship.posX, ship.posY, spaceshipSize, spaceshipSize);
+  }
+
+  self.explodeAll = function() {
+
+    document.body.style.filter = 'invert(100%)';
+
+    setTimeout(function() {
+
+      document.body.style.filter = 'none';
+
+      for (let i = 0; i < asteroids.length; i++) {
+        // Add an explosion to the array
+        boom.push({ x: asteroids[i].posX, y: asteroids[i].posY, animX: boomSpeed, animY: boomSpeed });
+        newScore++;
+        nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
+
+        // Mark the hit
+        asteroids[i].del = true;
+      }
+    }, 500);
   }
 }
 
@@ -528,17 +723,6 @@ function Bonus() {
   }
 }
 
-function gameRun() {
-  renderGame();
-}
-
-function renderGame() {
-  context.fillStyle = playing.color;
-  context.fillRect(playing.top, playing.left, playing.width, playing.height);
-
-  newEnemy.enemyPaint();
-  ship.paintSpaceship();
-}
 
 // UTILS
 
@@ -555,6 +739,16 @@ function generateColor() {
 // Function for converting degrees to radians
 function toRadians(angle) {
   return angle * (Math.PI / 180);
+}
+
+// Function for converting the game score to a string
+function scoreText(number) {
+  let s = String(number);
+  let str = '00000000';
+  let n = str.length - s.length;
+  str = str.slice(0, n);
+  str = str + number;
+  return str;
 }
 
 // Function shows the number of lives
@@ -605,7 +799,7 @@ function displayBonuses() {
   }
 }
 
-gameRun();
+
 
 // AJAX
 let ajaxHandlerScript = 'https://fe.it-academy.by/AjaxStringStorage2.php';
@@ -743,4 +937,265 @@ function update(pass) {
       .then(response => response.json())
       .then(data => { console.log(data); })
       .catch(error => { console.error(error); });
+}
+
+// Controller
+function Controller() {
+  let self = this;
+  self.accel = 4;
+  self.keyUP = 38;
+  self.keyDown = 40;
+  self.keyLeft = 37;
+  self.keyRight = 39;
+  self.keyFire = 32;
+  self.speedStop = 0;
+  self.keyBang = 17;
+
+  self.start = function() {
+
+    // Move the ship with the mouse
+    gameWrapper.addEventListener('mousemove', self.flyShip, false);
+    // Shooting
+    document.addEventListener('click', self.fireShip, false);
+    // Subscribe to touch events
+    gameWrapper.addEventListener('touchstart', self.fireShipTouch, false);
+    gameWrapper.addEventListener('touchend', function (EO) {
+      EO = EO || window.event;
+      EO.preventDefault();
+    }, false);
+
+    // Processing a gesture, using a bonus
+    $('.gameDiv').bind('swipeDown', function() {
+
+      if (ship.bonuses) {
+        ship.explodeAll();
+        ship.bonuses--;
+        displayBonuses();
+      }
+    })
+
+    gameWrapper.addEventListener('touchmove', self.flyShipTouch, false);
+
+    // Button control
+    document.addEventListener('keydown', self.keyShip, false);
+    document.addEventListener('keyup', self.stop, false);
+  }
+
+  self.remList = function() {
+
+    // Unsubscribe from events
+    document.removeEventListener('click', self.fireShip, false);
+    document.removeEventListener('keydown', self.keyShip, false);
+    document.removeEventListener('keyup', self.stop, false);
+    gameWrapper.removeEventListener('mousemove', self.flyShip, false);
+    gameWrapper.removeEventListener('touchstart', self.fireShipTouch, false);
+    gameWrapper.removeEventListener('touchmove', self.flyShipTouch, false);
+    gameWrapper.removeEventListener('touchend', function (EO) {
+      EO = EO || window.event;
+      EO.preventDefault();
+    }, false);
+
+    $('.gameDiv').unbind('swipeDown');
+  }
+
+  self.resize = function() {
+    bodyHeight = document.body.offsetHeight;
+    bodyWidth = document.body.offsetWidth;
+
+    // If the high score table is open, change the size
+    if (tableNone) {
+      scoreTable.style.display = 'none';
+      scoreTableHeight = scoreTable.offsetHeight;
+      scoreTableWidth = scoreTable.offsetWidth;
+      tableNone = false;
+      tableScore();
+    } else {
+      tableNone = true;
+      tableScore();
+    }
+
+    planetSize = Math.round(((bodyHeight + bodyWidth) / 2) / 3);
+    spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
+    asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
+    boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
+    bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 18);
+    healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
+    bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
+    newFire.fireSize = spaceshipSize / 3;
+
+    for (let i = 0; i < asteroids.length; i++) {
+      asteroids[i].size = asteroidSize;
+    }
+
+    for (let i = 0; i < bonus.length; i++) {
+      bonus[i].size = bonusSize;
+    }
+
+    displayHealth();
+    displayBonuses();
+
+    playing.height = bodyHeight;
+    playing.width = bodyWidth;
+
+    newCanvas.setAttribute('height', playing.height);
+    newCanvas.setAttribute('width', playing.width);
+
+    if (ship.posY >= bodyHeight) {
+      ship.posY = bodyHeight - spaceshipSize;
+    }
+
+    if (ship.posX >= bodyWidth) {
+      ship.posX = bodyWidth - spaceshipSize;
+    }
+  }
+
+  self.flyShip = function (EO) {
+    EO = EO || window.event;
+    EO.preventDefault();
+
+    ship.posX = EO.pageX - spaceshipSize / 2;
+    ship.posY = EO.pageY - spaceshipSize / 2;
+  }
+
+  self.flyShipTouch = function (EO) {
+    EO = EO || window.event;
+    EO.preventDefault();
+
+    // Get an array of touches
+    let touchInfo = EO.targetTouches[0];
+    ship.posX = touchInfo.pageX - spaceshipSize / 2;
+    ship.posY = touchInfo.pageY - spaceshipSize;
+  }
+
+  self.fireShip = function(EO) {
+    EO = EO || window.event;
+    EO.preventDefault();
+    // If there is no shot, create it
+    if (fire.length === 0 && ship.lives !== 0) {
+      newFire.addFire((ship.posX + spaceshipSize / 2), ship.posY);
+    }
+  }
+
+  self.fireShipTouch = function(EO) {
+    EO = EO || window.event;
+    EO.preventDefault();
+    // If there is no shot, create it
+    if (fire.length === 0 && ship.life !== 0) {
+      newFire.addFire(ship.posX + spaceshipSize / 2, ship.posY);
+    }
+  }
+
+  self.keyShip = function(EO) {
+    EO = EO || window.event;
+
+    self.accel = 5;
+
+    switch (EO.keyCode) {
+
+      case self.keyUP:
+
+        ship.speedY = -self.accel;
+        // Going beyond the limits at the top
+        if (ship.posY <= playing.top) {
+          ship.posY = playing.top;
+          ship.speedY = 0;
+        }
+
+        break;
+
+      case self.keyDown:
+
+        ship.speedY = self.accel;
+
+        break;
+
+      case self.keyLeft:
+
+        ship.speedX = -self.accel;
+
+        break;
+
+      case self.keyRight:
+
+        ship.speedX = self.accel;
+
+        break;
+
+      case self.keyFire:
+
+        if (fire.length === 0 && ship.lives !== 0) {
+          newFire.addFire(ship.posX + spaceshipSize / 2, ship.posY);
+        }
+
+        break;
+
+      case self.keyBang:
+
+        if (ship.bonuses) {
+          ship.explodeAll();
+          ship.bonuses--;
+          displayBonuses();
+        }
+
+        break;
+    }
+  }
+
+  self.stop = function(EO) {
+
+    if (EO.keyCode === self.keyRight || EO.keyCode === self.keyLeft) {
+      ship.speedX = self.speedStop;
+    }
+
+    if (EO.keyCode === self.keyDown || EO.keyCode === self.keyUP) {
+      ship.speedY = self.speedStop;
+    }
+  }
+
+  self.switchURLHash = function (EO) {
+    EO = EO || window.event;
+
+    let toClose;
+
+    // Find out the value of the hash
+    let URLHash = window.location.hash;
+
+    // Delete the first character
+    let stateStr = URLHash.substr(1);
+
+    switch (stateStr) {
+
+      case 'menu':
+
+        // Switch to the menu from the running game
+        if (isPlaying) {
+
+          toClose = confirm('После перезагрузки страницы прогресс игры будет утрачен!');
+
+          if (toClose) {
+            // Unsubscribe from events
+            self.remList();
+            startMenu();
+            isPlaying = false;
+          }
+
+          else location.hash = 'game';
+        }
+
+        // if game is over
+        else startMenu();
+
+        break;
+
+      case 'game':
+        startGame();
+        break;
+    }
+  }
+
+  self.befUnload = function(EO) {
+    if (isPlaying) {
+      EO.returnValue = 'После перезагрузки страницы прогресс игры будет утрачен!';
+    }
+  }
 }
