@@ -77,7 +77,7 @@ let playing = {
 
 // Set sizes
 let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
-let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
+let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 8);
 let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 18);
