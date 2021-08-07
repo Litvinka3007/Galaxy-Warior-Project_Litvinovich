@@ -31,6 +31,7 @@ function Spaceship() {
 
   self.explodeAll = function() {
 
+    clickSound(bangAudio);
     document.body.style.filter = 'invert(100%)';
 
     setTimeout(function() {
@@ -38,6 +39,7 @@ function Spaceship() {
       document.body.style.filter = 'none';
 
       for (let i = 0; i < asteroids.length; i++) {
+        clickSound(crashSound);
         // Add an explosion to the array
         boom.push({ x: asteroids[i].posX, y: asteroids[i].posY, animX: boomSpeed, animY: boomSpeed });
         newScore++;

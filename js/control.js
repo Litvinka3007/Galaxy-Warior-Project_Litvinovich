@@ -130,6 +130,7 @@ function Controller() {
     EO.preventDefault();
     // If there is no shot, create it
     if (fire.length === 0 && ship.lives !== 0) {
+      clickSound(shotSound);
       newFire.addFire((ship.posX + spaceshipSize / 2), ship.posY);
     }
   }
@@ -138,7 +139,8 @@ function Controller() {
     EO = EO || window.event;
     EO.preventDefault();
     // If there is no shot, create it
-    if (fire.length === 0 && ship.life !== 0) {
+    if (fire.length === 0 && ship.lives !== 0) {
+      clickSound(shotSound);
       newFire.addFire(ship.posX + spaceshipSize / 2, ship.posY);
     }
   }
@@ -182,6 +184,7 @@ function Controller() {
       case self.keyFire:
 
         if (fire.length === 0 && ship.lives !== 0) {
+          clickSound(shotSound);
           newFire.addFire(ship.posX + spaceshipSize / 2, ship.posY);
         }
 

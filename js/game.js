@@ -1,42 +1,63 @@
+// Add sounds
+let backAudio = new Audio('sounds/back.mp3');
+backAudio.volume = 0.2;
+
+let shotSound = new Audio('sounds/fire.mp3');
+shotSound.volume = 0.4;
+
+let crashSound = new Audio('sounds/crash.mp3');
+crashSound.volume = 0.7;
+
+let bonusAudio = new Audio('sounds/bonus.mp3');
+bonusAudio.volume = 0.5;
+
+let gameoverAudio = new Audio("sounds/gameover.mp3");
+gameoverAudio.volume = 0.5;
+
+let bangAudio = new Audio('sounds/bigbang.mp3');
+bangAudio.volume = 0.5;
+
+bangAudio.onload = soundClick;
+
 // Add images
 let shipImg = new Image();
-shipImg.src = "img/ship.png";
+shipImg.src = 'img/ship3.png';
 
 let asteroidImg = new Image();
-asteroidImg.src = "img/aster.png";
+asteroidImg.src = 'img/aster.png';
 
 let asteroidImg2 = new Image();
-asteroidImg2.src = "img/aster2.png";
+asteroidImg2.src = 'img/aster2.png';
 
 let alien = new Image();
-alien.src = "img/spaceship.png";
+alien.src = 'img/enemy_menu.png';
 
 let alien2 = new Image();
-alien2.src = "img/alien2.png";
+alien2.src = 'img/enemy2.png';
 
 let alien3 = new Image();
-alien3.src = "img/alien3.png";
+alien3.src = 'img/enemy3.png';
 
 let explosion = new Image();
-explosion.src = "img/boom.png";
+explosion.src = 'img/boom.png';
 
 let planetImg = new Image();
-planetImg.src = "img/planet.png"
+planetImg.src = 'img/moon.png';
 
 let planetImg2 = new Image();
-planetImg2.src = "img/planet2.png"
+planetImg2.src = 'img/planet.png';
 
 let planetImg3 = new Image();
-planetImg3.src = "img/planet3.png"
+planetImg3.src = 'img/mars.png';
 
 let fire1 = new Image();
-fire1.src = "img/fire.png";
+fire1.src = 'img/fire.png';
 
 let bonusImg = new Image();
-bonusImg.src = "img/bonus.png";
+bonusImg.src = 'img/bonus.png';
 
 let bonusImg2 = new Image();
-bonusImg2.src = "img/bonus2.png";
+bonusImg2.src = 'img/health_point.png';
 
 let degreesCircle = 360;
 
@@ -68,7 +89,7 @@ let bodyHeight = document.body.offsetHeight;
 let bodyWidth = document.body.offsetWidth;
 
 let playing = {
-  color: '#0a0530',
+  color: '#000000',
   height: bodyHeight,
   width: bodyWidth,
   top: 0,
@@ -80,7 +101,7 @@ let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
 let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 8);
 let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
-let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 18);
+let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
 let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 let bangSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
 let scoreTableHeight;
@@ -94,7 +115,7 @@ let boomAccel = 0.2;
 let newStar = new Star();
 let newFire = new Fire();
 let newEnemy = new Enemy();
-let controll = new Controller();
+let control = new Controller();
 let ship = new Spaceship();
 let planet = new Planet();
 let newBonus = new Bonus();
@@ -133,6 +154,15 @@ function tableScore() {
     tableNone = false;
   }
 }
+
+// Subscribe to the URL hash change
+window.onhashchange = control.switchURLHash;
+
+// When restart or leave the page show a warning (if the game is running)
+window.onbeforeunload = control.befUnload;
+
+// Subscribe to the screen change
+window.addEventListener('resize', control.resize, false);
 
 // CANVAS
 let newCanvas = document.querySelector('.gameCanvas');
@@ -182,13 +212,19 @@ function startGame() {
 
   newCanvas.style.cursor = 'none';    // ПОМЕНЯТЬ КУРСОР НА КРАСНЫЙ ПРИЦЕЛ
 
-  controll.start();
+  clickSound(backAudio);
+
+  control.start();
   gameRun();
 }
 
 // Start the main menu
 function startMenu() {
   location.hash = 'menu';
+
+  if (isPlaying) {
+    backAudio.pause();
+  }
 
   // If there is a timer, delete it
   if (timerGame) {
@@ -220,7 +256,7 @@ function gameOver() {
   gameOverWrapper.style.display = 'block';
 
   // Unsubscribe from the game events
-  controll.remList();
+  control.remList();
 
   if (timerGame) {
     cancelAnimationFrame(timerGame);
@@ -228,6 +264,10 @@ function gameOver() {
   }
 
   newCanvas.style.cursor = 'default';
+
+  backAudio.pause();
+
+  clickSound(gameoverAudio);
 
   isPlaying = false;
 
@@ -242,6 +282,7 @@ function gameRun() {
   }
 
   timerGame = requestAnimationFrame(gameRun);
+
   updateGame();
   renderGame();
 }
@@ -250,8 +291,8 @@ function updateGame() {
   timer++;
 
   if (timer > 1000) timer = 0;
-  // Create stars
 
+  // Create stars
   if (timer % 2 === 0) {
     newStar.addStarObj();
   }
@@ -394,4 +435,28 @@ function displayBonuses() {
 
     bangContainer.appendChild(bangImg);
   }
+}
+
+// Functions for playing sounds
+function clickSound(clickAudio) {
+  clickAudio.currentTime = 0;
+  clickAudio.play();
+}
+
+function soundClick() {
+
+  shotSound.play();
+  shotSound.pause();
+
+  crashSound.play();
+  crashSound.pause();
+
+  backAudio.play();
+  backAudio.pause();
+
+  bonusAudio.play();
+  bonusAudio.pause();
+
+  bangAudio.play();
+  bangAudio.pause();
 }

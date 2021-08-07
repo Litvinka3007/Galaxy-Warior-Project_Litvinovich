@@ -12,7 +12,7 @@ function read() {
 }
 
 function addArrScore(arr) {
-  let arrWrapper = document.querySelector(".tableWrapper");
+  let arrWrapper = document.querySelector('.tableWrapper');
 
   if (arrWrapper.children.length > 1) {
     while (arrWrapper.children.length !== 1) {

@@ -43,15 +43,24 @@ function Bonus() {
       // Add a bonus after collide with a spaceship
       if (Math.abs(bonus[i].posY - ship.posY) <= bonus[i].size && Math.abs(bonus[i].posX - ship.posX) <= bonus[i].size) {
 
-        if (bonus[i].randomImg === 1 && ship.explosions < 4) {
+        if (bonus[i].randomImg === 1 && ship.bonuses < 4) {
+
+          clickSound(bonusAudio);
           bonus[i].del = true;
-          ship.explosions++;
+          ship.bonuses++;
+
         } else if (bonus[i].randomImg === 2 && ship.lives <= 4) {
+
+          clickSound(bonusAudio);
           bonus[i].del = true;
           ship.lives++;
+
         } else {
+
+          clickSound(bonusAudio);
           bonus[i].del = true;
-          // score
+          newScore += 10;
+          nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
         }
       }
 
