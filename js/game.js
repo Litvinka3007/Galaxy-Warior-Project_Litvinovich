@@ -21,7 +21,7 @@ bangAudio.onload = soundClick;
 
 // Add images
 let shipImg = new Image();
-shipImg.src = 'img/ship3.png';
+shipImg.src = 'img/ship.png';
 
 let asteroidImg = new Image();
 asteroidImg.src = 'img/aster.png';
@@ -98,7 +98,7 @@ let playing = {
 
 // Set sizes
 let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
-let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 8);
+let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 6);
 let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
