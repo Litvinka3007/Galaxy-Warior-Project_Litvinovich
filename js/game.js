@@ -24,10 +24,10 @@ let shipImg = new Image();
 shipImg.src = 'img/ship.png';
 
 let asteroidImg = new Image();
-asteroidImg.src = 'img/aster.png';
+asteroidImg.src = 'img/asteroid.png';
 
 let asteroidImg2 = new Image();
-asteroidImg2.src = 'img/aster2.png';
+asteroidImg2.src = 'img/asteroid2.png';
 
 let alien = new Image();
 alien.src = 'img/enemy_menu.png';
@@ -99,7 +99,7 @@ let playing = {
 // Set sizes
 let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
 let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 6);
-let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
+let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 9);
 let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
 let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
