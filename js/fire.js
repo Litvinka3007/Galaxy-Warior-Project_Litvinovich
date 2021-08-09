@@ -24,11 +24,13 @@ function Fire() {
       for (let j = 0; j < fire.length; j++) {
         if (fire[j].posY <= asteroids[i].posY + asteroids[i].size && fire[j].posY + fire[j].size >= asteroids[i].posY && fire[j].posX + fire[j].size >= asteroids[i].posX && fire[j].posX <= asteroids[i].posX + asteroids[i].size) {
 
-          if(asteroids[i].randomImg < 3 && asteroids[i].node ) {
+          if(asteroids[i].randomImg < 3 && asteroids[i].node) {
             let size = { posX: asteroids[i].posX, posY: asteroids[i].posY, img: asteroids[i].randomImg }
             newEnemy.addAsteroids(size, 'left');
             newEnemy.addAsteroids(size, 'right');
           }
+
+          clickSound(crashSound);
 
           // Removing the bullet from the array
           fire.splice(j, 1);
@@ -38,7 +40,9 @@ function Fire() {
 
           // Marking the hit
           asteroids[i].del = true;
-          // score
+
+          newScore++;
+          nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
         }
       }
     }
