@@ -48,12 +48,14 @@ function Bonus() {
           clickSound(bonusAudio);
           bonus[i].del = true;
           ship.bonuses++;
+          displayBonuses();
 
         } else if (bonus[i].randomImg === 2 && ship.lives <= 4) {
 
           clickSound(bonusAudio);
           bonus[i].del = true;
           ship.lives++;
+          displayHealth();
 
         } else {
 
