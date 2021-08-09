@@ -22,6 +22,31 @@ function Spaceship() {
 
     // Checking for going out of bounds on the top
     if (ship.posY < playing.top) ship.posY = playing.top;
+
+    // Collision with an enemy
+    for (let i = 0; i < asteroids.length; i++) {
+      if (Math.abs(asteroids[i].posY - self.posY) <= asteroids[i].size && Math.abs(asteroids[i].posX - self.posX) <= asteroids[i].size) {
+
+        clickSound(crashSound);
+
+        boom.push({ x: asteroids[i].posX, y: asteroids[i].posY, animX: boomSpeed, animY: boomSpeed });
+
+        asteroids[i].del = true;
+
+        self.lives--;
+
+        displayHealth();
+
+        if (navigator.vibrate) { // Does the device supports Vibration API?
+          window.navigator.vibrate(100); // Vibration 100ms
+        }
+      }
+
+      // If lives are over - the game is over
+      if (self.lives <= 0 && boom.length === 0) {
+        gameOver();
+      }
+    }
   }
 
   self.paintSpaceship = function() {
