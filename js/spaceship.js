@@ -57,11 +57,8 @@ function Spaceship() {
   self.explodeAll = function() {
 
     clickSound(bangAudio);
-    document.body.style.filter = 'invert(100%)';
 
     setTimeout(function() {
-
-      document.body.style.filter = 'none';
 
       for (let i = 0; i < asteroids.length; i++) {
         clickSound(crashSound);
