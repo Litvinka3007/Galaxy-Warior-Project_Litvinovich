@@ -100,6 +100,7 @@ let playing = {
 let planetSize = ((bodyHeight + bodyWidth) / 2) / 3;
 let spaceshipSize = Math.round(((bodyHeight + bodyWidth) / 2) / 6);
 let asteroidSize = Math.round(((bodyHeight + bodyWidth) / 2) / 9);
+
 let boomSize = Math.round(((bodyHeight + bodyWidth) / 2) / 11);
 let bonusSize = Math.round(((bodyHeight + bodyWidth) / 2) / 12);
 let healthSize = Math.round(((bodyHeight + bodyWidth) / 2) / 15);
@@ -150,7 +151,7 @@ function tableScore() {
   } else {
     scoreTable.style.top = '0';
     scoreTable.style.left = '50%';
-    scoreTable.style.transform = 'translateZ(0) translateX(-50%)  translateY(-100%) ';
+    scoreTable.style.transform = 'translateZ(0) translateX(-50%) translateY(-100%) ';
     tableNone = false;
   }
 }
@@ -210,7 +211,7 @@ function startGame() {
   displayHealth();
   displayBonuses();
 
-  newCanvas.style.cursor = 'none';    // ПОМЕНЯТЬ КУРСОР НА КРАСНЫЙ ПРИЦЕЛ
+  newCanvas.style.cursor = 'none';
 
   clickSound(backAudio);
 
@@ -246,32 +247,6 @@ function startMenu() {
   ship.bonuses = 3;
   newScore = 0;
   nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
-}
-
-function gameOver() {
-  let overScore = document.querySelector('.overInfo');
-
-  // Hide the game elements
-  gameWrapper.style.display = 'none';
-  gameOverWrapper.style.display = 'block';
-
-  // Unsubscribe from the game events
-  control.remList();
-
-  if (timerGame) {
-    cancelAnimationFrame(timerGame);
-    timerGame = 0;
-  }
-
-  newCanvas.style.cursor = 'default';
-
-  backAudio.pause();
-
-  clickSound(gameoverAudio);
-
-  isPlaying = false;
-
-  overScore.innerText = nickText + ' : ' + scoreText(newScore);
 }
 
 function gameRun() {
@@ -360,6 +335,32 @@ function renderGame() {
   }
 
   ship.paintSpaceship();
+}
+
+function gameOver() {
+  let overScore = document.querySelector('.overInfo');
+
+  // Hide the game elements
+  gameWrapper.style.display = 'none';
+  gameOverWrapper.style.display = 'block';
+
+  // Unsubscribe from the game events
+  control.remList();
+
+  if (timerGame) {
+    cancelAnimationFrame(timerGame);
+    timerGame = 0;
+  }
+
+  newCanvas.style.cursor = 'default';
+
+  backAudio.pause();
+
+  clickSound(gameoverAudio);
+
+  isPlaying = false;
+
+  overScore.innerText = nickText + ' : ' + scoreText(newScore);
 }
 
 // UTILS

@@ -213,7 +213,7 @@ function Controller() {
     }
   }
 
-  self.switchURLHash = function (EO) {
+  self.switchURLHash = function(EO) {
     EO = EO || window.event;
 
     let toClose;
@@ -221,10 +221,10 @@ function Controller() {
     // Find out the value of the hash
     let URLHash = window.location.hash;
 
-    // Delete the first character
+    // Delete the # character and save the hash value to the variable
     let stateStr = URLHash.substr(1);
 
-    switch (stateStr) {
+    switch(stateStr) {
 
       case 'menu':
 
