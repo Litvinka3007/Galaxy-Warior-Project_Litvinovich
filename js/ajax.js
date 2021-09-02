@@ -3,7 +3,7 @@ let ajaxHandlerScript = 'https://fe.it-academy.by/AjaxStringStorage2.php';
 function read() {
   let sp = new URLSearchParams();
   sp.append('f', 'READ');
-  sp.append('n', 'LITVINOVICH_GALAXY-WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
 
   fetch(ajaxHandlerScript, { method: 'post', body: sp })
       .then(response => response.json())
@@ -58,7 +58,7 @@ function lockGet(pass) {
 
   let sp = new URLSearchParams();
   sp.append('f', 'LOCKGET');
-  sp.append('n', 'LITVINOVICH_GALAXY-WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
   sp.append('p', pass);
 
   fetch(ajaxHandlerScript, { method: 'post', body: sp })
@@ -125,7 +125,7 @@ function update(pass) {
 
   let sp = new URLSearchParams();
   sp.append('f', 'UPDATE');
-  sp.append('n', 'LITVINOVICH_GALAXY-WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
   sp.append('p', pass);
   sp.append('v', arrJson);
 

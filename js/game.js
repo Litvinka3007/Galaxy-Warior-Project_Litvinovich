@@ -203,7 +203,7 @@ function startGame() {
   nickText = nickname.value;
 
   // If the field "nickname" is empty, assign "user"
-  if (nickText == '') nickText = 'User';
+  if (nickText === '') nickText = 'User';
 
   nicknameInfo.innerText = nickText + ' : ' + scoreText(newScore);
 
@@ -445,7 +445,6 @@ function clickSound(clickAudio) {
 }
 
 function soundClick() {
-
   shotSound.play();
   shotSound.pause();
 
