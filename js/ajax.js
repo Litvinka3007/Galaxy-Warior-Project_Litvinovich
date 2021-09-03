@@ -3,7 +3,7 @@ let ajaxHandlerScript = 'https://fe.it-academy.by/AjaxStringStorage2.php';
 function read() {
   let sp = new URLSearchParams();
   sp.append('f', 'READ');
-  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH__GAME');
 
   fetch(ajaxHandlerScript, { method: 'post', body: sp })
       .then(response => response.json())
@@ -58,7 +58,7 @@ function lockGet(pass) {
 
   let sp = new URLSearchParams();
   sp.append('f', 'LOCKGET');
-  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH__GAME');
   sp.append('p', pass);
 
   fetch(ajaxHandlerScript, { method: 'post', body: sp })
@@ -75,62 +75,24 @@ function newArr(data) {
 
 function update(pass) {
   let newArray = JSON.parse(arrScore);
-
-  for (let i = 0; i < newArray.length; i++) {
-    if (parseInt(scoreData.score) > parseInt(newArray[i].score)) {
-      if (i === 0) {
-
-        newArray[i + 2].name = newArray[i + 1].name;
-        newArray[i + 2].score = newArray[i + 1].score;
-        newArray[i + 1].name = newArray[i].name;
-        newArray[i + 1].score = newArray[i].score;
-
-        newArray[i].name = scoreData.name;
-        newArray[i].score = scoreData.score;
-
-        break;
-
-      } else if (i === 1) {
-
-        newArray[i + 1].name = newArray[i].name;
-        newArray[i + 1].score = newArray[i].score;
-
-        newArray[i].name = scoreData.name;
-        newArray[i].score = scoreData.score;
-
-        break;
-
-      } else {
-
-        newArray[i].name = scoreData.name;
-        newArray[i].score = scoreData.score;
-
-        break;
-      }
-    }
-  }
-
+  newArray.push(scoreData)
+  newArray = newArray.sort((item, nextItem)=>{return nextItem.score - item.score})
   scoreData = null;
-
-  // Results reset
-  /*
-    for (let i=0; i < newArray.length; i++) {
-     newArray[i].name = scoreData.name;
-     newArray[i].score = scoreData.score;
-    }
-   scoreData = null;
-  */
 
   let arrJson = JSON.stringify(newArray);
 
   let sp = new URLSearchParams();
   sp.append('f', 'UPDATE');
-  sp.append('n', 'LITVINOVICH_WARIOR_GAME');
+  sp.append('n', 'LITVINOVICH__GAME');
   sp.append('p', pass);
   sp.append('v', arrJson);
 
-  fetch(ajaxHandlerScript, { method: 'post', body: sp })
+  fetch(ajaxHandlerScript, {method: 'post', body: sp})
       .then(response => response.json())
-      .then(data => { console.log(data); })
-      .catch(error => { console.error(error); });
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
 }
